@@ -5,11 +5,13 @@
 #include <ctype.h>
 #include "../int_hex.h"
 
-#define ASCII_START
+#define ASCII_START 32
 #define ASCII_END 126
+#define ASCII_LOW_INDEX 97
+#define ASCII_HIGH_INDEX 64
 
 struct tuple find_key(char *hexString);
-int letter_freq(char *string);
+int char_freq(char *string);
 
 struct tuple {
     char key;
@@ -17,9 +19,10 @@ struct tuple {
 };
 
 int main(void) {
-    struct tuple t = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
-    printf("%s\n", t.string);
-    printf("%c\n", t.key);
+    // struct tuple t = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
+    // int p = char_freq("We cooking beef tonight!");
+    // int p = char_freq("etaion shrdlu etaion shrdlu");
+    // printf("%d\n", p); 
     return 0;
 }
 
@@ -38,7 +41,7 @@ struct tuple find_key(char *hexString) {
         }
         // printf("%s\n", string);
         string[++j] = '\0';
-        strcpy(t[k].string);
+        // strcpy(t[k].string);
         // if (score < letter_freq(string)) {
         //     strcpy(high_string, string);
         //     key = guess;       
@@ -46,20 +49,43 @@ struct tuple find_key(char *hexString) {
     }
     char *high_string = malloc(strlen(hexString));
 
-    return ret;
+    return t[0];
 }
 
-int letter_freq(char *string) {
-    // int score = 0;
-    // char common[] = "etaion shrdlu";
-    // for (int i = 0; i < strlen(string); i++) {
-    //     for (int j = 0; j < strlen(common); j++) {
-    //         if (tolower(string[i]) == common[j]) score++;
-    //     }
-    // }
-    float frequency[] = {0.082, 0.015, 0.028, 0.043, 0.127, 0.022, 
-                         0.02, 0.061, 0.07, 0.0016, 0.0077, 0.04, 0.024,
-                         0.067, 0.075, 0.019, 0.00095, 0.06, 0.063, 0.091,
-                         0.028, 0.0098, 0.024, 0.0015, 0.02, 0.00074, 0.127 * 2}
-    return 5;
+int char_freq(char *string) {
+    // frequencies of characters from a-z, with space (" ") at the end.
+    float freq[] = {0.082f, 0.015f, 0.028f, 0.043f, 0.127f, 0.022f, 
+                         0.02f, 0.061f, 0.07f, 0.0016f, 0.0077f, 0.04f, 0.024f,
+                         0.067f, 0.075f, 0.019f, 0.00095f, 0.06f, 0.063f, 0.091f,
+                         0.028f, 0.0098f, 0.024f, 0.0015f, 0.02f, 0.00074f, 0.127f * 2};
+    
+    int occurrences;
+    double expected;
+    int chi_squared = 0;
+    for (char i = 'a'; i <= 'z'; i++) { 
+        occurrences = 0;
+        // finds the number of occurrences of character i
+        for (int j = 0; j < strlen(string); j++) {
+            if (string[j] == i) occurrences++;
+        }
+        // finds the _expected_ number of occurrences of character i
+        expected = 0;
+        for (int k = 0; k < strlen(string); k++) {
+            expected += k * freq[i - ASCII_LOW_INDEX];
+        }
+        chi_squared += (occurrences - expected) * (occurrences - expected) / expected;
+    }
+
+    int spaces = 0;
+    int expected_spaces = 0;
+    // finds the number of spaces
+    for (int i = 0; i < strlen(string); i++) {
+        if (string[i] == ' ') spaces++;
+    }
+    // finds expected number of spaces
+    for (int j = 0; j < strlen(string); j++) {
+        expected_spaces += j * freq[26];
+    }
+    chi_squared += (spaces - expected_spaces) * (spaces - expected_spaces) / expected_spaces;
+    return chi_squared;
 }
