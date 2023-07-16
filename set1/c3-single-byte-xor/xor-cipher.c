@@ -4,38 +4,40 @@
 #include <string.h>
 #include <ctype.h>
 #include "../int_hex.h"
+#include "xor-cipher.h"
 
 #define ASCII_START 32
 #define ASCII_END 126
 #define BAD_SCORE 100000000;
 
+// written here for reference
+// struct tuple {
+//     char key;
+//     char *string;
+// };
+
 struct tuple find_key(char *hexString);
-float char_freq(char *string);
+double char_freq(char *string);
 
-struct tuple {
-    char key;
-    char *string;
-};
-
-int main(void) {
-    struct tuple t;
-    t.string = malloc(1000); 
-    t.key = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736").key;
-    t.string = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736").string;
-    printf("t.string: %s\n", t.string);
-    free(t.string);
-    // float p = char_freq("We cooking beef tonight!");
-    // float p = char_freq("Fjjnlkb%HF\"v%iln`%d%ujpka%jc%gdfjk");
-    // float p = char_freq("Hi, how are you?");
-    // printf("%f\n", p); 
-    return 0;
-}
+// int main(void) {
+//     struct tuple t;
+//     t.string = malloc(1000); 
+//     t.key = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736").key;
+//     t.string = find_key("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736").string;
+//     printf("t.string: %s\n", t.string);
+//     free(t.string);
+//     // float p = char_freq("We cooking beef tonight!");
+//     // float p = char_freq("Fjjnlkb%HF\"v%iln`%d%ujpka%jc%gdfjk");
+//     // float p = char_freq("Hi, how are you?");
+//     // printf("%f\n", p); 
+//     return 0;
+// }
 
 struct tuple find_key(char *hexString) {
     char guess;
     struct tuple ret;
     ret.string = malloc(strlen(hexString));
-    float score = BAD_SCORE;
+    double score = BAD_SCORE;
 
     char *hex_int = int_hex(hexString);
 
@@ -64,7 +66,7 @@ struct tuple find_key(char *hexString) {
     return ret;
 }
 
-float char_freq(char *string) {
+double char_freq(char *string) {
     // frequencies of ascii characters in english text gotten from:
     // https://reusablesec.blogspot.com/2009/05/character-frequency-analysis-info.html
 
